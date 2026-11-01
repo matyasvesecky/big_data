@@ -1,0 +1,30 @@
+# Python implementation
+venv/
+.venv/
+env/
+bin/
+lib/
+share/
+include/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebook benchmarks and checkpoints
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# Databases
+*.duckdb
+
+# Data files (these are large and can be regenerated)
+*.csv
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

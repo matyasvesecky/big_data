@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoltCity Dynamics – Průvodní dokument</title>
+<style>
+  :root {
+    --primary: #1a73e8;
+    --accent:  #fbbc04;
+    --dark:    #1e2a3a;
+    --light:   #f8faff;
+    --border:  #dee2ef;
+    --success: #27ae60;
+    --warning: #e67e22;
+    --danger:  #e74c3c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--light);
+    color: #2c3e50;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── Sidebar ── */
+  nav {
+    width: 240px;
+    min-height: 100vh;
+    background: var(--dark);
+    color: #ecf0f1;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    padding: 24px 20px 16px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent);
+    border-bottom: 1px solid #34495e;
+    letter-spacing: .3px;
+  }
+  .nav-logo span { display: block; font-size:.75rem; font-weight:400; color:#95a5a6; margin-top:4px; }
+  nav ul { list-style: none; padding: 12px 0; }
+  nav ul li a {
+    display: block;
+    padding: 9px 20px;
+    color: #bdc3c7;
+    text-decoration: none;
+    font-size: .85rem;
+    transition: all .2s;
+    border-left: 3px solid transparent;
+  }
+  nav ul li a:hover, nav ul li a.active {
+    color: #fff;
+    background: rgba(255,255,255,.07);
+    border-left-color: var(--accent);
+  }
+  nav ul li.section-head a {
+    color: #7f8c8d;
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    padding-top: 16px;
+    cursor: default;
+  }
+  nav ul li.section-head a:hover { background: none; border-color: transparent; }
+
+  /* ── Main ── */
+  main { flex: 1; padding: 40px 48px; max-width: 960px; }
+  section { margin-bottom: 56px; scroll-margin-top: 24px; }
+
+  h1 { font-size: 2rem; color: var(--dark); margin-bottom: 6px; }
+  .subtitle { color: #7f8c8d; margin-bottom: 32px; font-size: .95rem; }
+  h2 {
+    font-size: 1.4rem;
+    color: var(--dark);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--primary);
+    display: flex; align-items: center; gap: 8px;
+  }
+  h3 { font-size: 1.05rem; margin: 20px 0 10px; color: #34495e; }
+  p, li { line-height: 1.7; margin-bottom: 8px; font-size: .9rem; }
+  ul, ol { padding-left: 20px; }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 12px;
+    font-size: .75rem;
+    font-weight: 600;
+    vertical-align: middle;
+  }
+  .badge-blue   { background:#dbeafe; color:#1d4ed8; }
+  .badge-green  { background:#d1fae5; color:#065f46; }
+  .badge-yellow { background:#fef3c7; color:#92400e; }
+  .badge-red    { background:#fee2e2; color:#991b1b; }
+
+  /* ── Cards / KPI boxes ── */
+  .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 20px 0; }
+  .kpi-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    border-top: 4px solid var(--primary);
+  }
+  .kpi-card .kpi-val { font-size: 2rem; font-weight: 700; color: var(--primary); }
+  .kpi-card .kpi-lbl { font-size: .8rem; color: #7f8c8d; margin-top: 2px; }
+  .kpi-card .kpi-sub { font-size: .78rem; margin-top: 8px; }
+
+  /* ── Tables ── */
+  .tbl-wrap { overflow-x: auto; margin: 14px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+  th {
+    background: var(--dark);
+    color: #fff;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+  }
+  td { padding: 9px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) { background: #f8faff; }
+  tr:hover { background: #eef2ff; }
+
+  /* ── Code / schema blocks ── */
+  code {
+    background: #1e2a3a;
+    color: #a8d8ea;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Cascadia Code','Fira Code', 'Courier New', monospace;
+    font-size: .82rem;
+  }
+  pre {
+    background: #1e2a3a;
+    color: #cdd6e0;
+    padding: 18px 22px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: 'Cascadia Code','Fira Code', monospace;
+    font-size: .8rem;
+    line-height: 1.6;
+    margin: 12px 0;
+  }
+  pre .kw   { color: #c792ea; }
+  pre .col  { color: #82aaff; }
+  pre .cmt  { color: #546e7a; font-style: italic; }
+  pre .typ  { color: #ffcb6b; }
+
+  /* ── Alert boxes ── */
+  .alert {
+    border-left: 4px solid;
+    padding: 12px 16px;
+    border-radius: 0 6px 6px 0;
+    margin: 14px 0;
+    font-size: .88rem;
+  }
+  .alert-info    { border-color: var(--primary); background: #eff6ff; }
+  .alert-warning { border-color: var(--warning); background: #fff7ed; }
+  .alert-success { border-color: var(--success); background: #f0fdf4; }
+
+  /* ── Arch diagram ── */
+  .arch-diagram {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+  .arch-box {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    text-align: center;
+    font-size: .82rem;
+    font-weight: 600;
+    min-width: 100px;
+  }
+  .arch-box .icon { font-size: 1.5rem; display: block; margin-bottom: 4px; }
+  .arch-box.highlight { border-color: var(--primary); background: #eff6ff; }
+  .arch-arrow { font-size: 1.3rem; color: #95a5a6; }
+
+  /* ── RACI ── */
+  .r { color: #1d4ed8; font-weight: 700; }
+  .a { color: #065f46; font-weight: 700; }
+  .c { color: #92400e; font-weight: 700; }
+  .i { color: #6b7280; font-weight: 700; }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    nav { display: none; }
+    main { padding: 24px; }
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Sidebar Navigation ── -->
+<nav>
+  <div class="nav-logo">
+    🛴 VoltCity Dynamics
+    <span>Průvodní dokument projektu</span>
+  </div>
+  <ul>
+    <li class="section-head"><a>Sekce</a></li>
+    <li><a href="#s1">1. Firma a KPI</a></li>
+    <li><a href="#s2">2. Technické řešení</a></li>
+    <li><a href="#s3">3. Data Governance</a></li>
+    <li><a href="#s4">4. Data a EDA</a></li>
+    <li><a href="#s5">5. Závěry</a></li>
+    <li><a href="#s6">6. Metodika</a></li>
+  </ul>
+</nav>
+
+<!-- ── Main Content ── -->
+<main>
+
+  <h1>VoltCity Dynamics</h1>
+  <p class="subtitle">
+    Datový produkt pro sdílenou mikromobilitu v Praze &nbsp;|&nbsp;
+    <span class="badge badge-blue">Zpracování velkých dat</span>
+    <span class="badge badge-green">DuckDB</span>
+    <span class="badge badge-yellow">Python 3.11</span>
+  </p>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- SEKCE 1 -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <section id="s1">
+    <h2>📋 1. Představení firmy a cílů (KPI)</h2>
+
+    <h3>Kontext</h3>
+    <ul>
+      <li><strong>Název firmy:</strong> VoltCity Dynamics</li>
+      <li><strong>Doména:</strong> Sdílená mikromobilita – elektrokoloběžky a e-kola v metropolitní oblasti Prahy</li>
+      <li><strong>Zákazníci:</strong> Dojíždějící (commuters) 18–45 let a turisté v historickém centru</li>
+      <li><strong>Problém:</strong> Neefektivní rozmístění flotily → ušlý zisk ve špičkách, vysoké náklady na svoz vybitých strojů</li>
+    </ul>
+
+    <h3>Business Questions</h3>
+    <ol>
+      <li>Kde a kdy vznikají <em>„hluchá místa"</em>? (Vysoká poptávka, žádný dostupný stroj)</li>
+      <li>Jaká je korelace mezi <em>nepříznivým počasím</em> a mírou využití flotily?</li>
+      <li>Kteří uživatelé mají nejvyšší <em>tendenci k churnu</em>?</li>
+      <li>Která vozidla potřebují <em>servis</em> a jaká je návratnost investice do údržby? (→ Bateriová analýza, ROI model)</li>
+    </ol>
+
+    <h3>Klíčové ukazatele výkonnosti (KPI)</h3>
+    <div class="tbl-wrap">
+    <table>
+      <tr>
+        <th>KPI</th><th>Vzorec / Definice</th><th>Jednotka</th>
+        <th>Baseline</th><th>Cíl</th><th>Frekvence</th>
+      </tr>
+      <tr>
+        <td><strong>Utilization Rate (UR)</strong> – vytíženost flotily</td>
+        <td><code>Σ Doba jízdy / Σ Doba online × 100</code></td>
+        <td>%</td><td>12 %</td><td>18 %</td><td>Denně</td>
+      </tr>
+      <tr>
+        <td><strong>Churn Rate (CR)</strong> – odchod uživatelů</td>
+        <td>Uživatelé bez jízdy v posl. 30 dnech (z aktivní báze)</td>
+        <td>%</td><td>25 %</td><td>&lt; 15 %</td><td>Měsíčně</td>
+      </tr>
+      <tr>
+        <td><strong>Revenue Per KM (RPK)</strong> – výnosnost km</td>
+        <td><code>Celkové tržby / Celková vzdálenost (km)</code></td>
+        <td>Kč / km</td><td>30 Kč</td><td>45 Kč</td><td>Týdně</td>
+      </tr>
+    </table>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-val">~10 %</div>
+        <div class="kpi-lbl">UR – léto 2024 (cíl: 18 %)</div>
+        <div class="kpi-sub">⚠️ Pod cílem. Cíl 18 % není dosahován ani v letní sezóně.</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val">~65 %</div>
+        <div class="kpi-lbl">CR – průměr 2024 (cíl: &lt;15 %)</div>
+        <div class="kpi-sub">⛔ Kritická hodnota. Výrazně nad cílem. Zásadní problém s retencí.</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val">~19 Kč</div>
+        <div class="kpi-lbl">RPK – průměr 2024 (cíl: 45 Kč)</div>
+        <div class="kpi-sub">⛔ Výrazně pod cílem. Subscriberský tarif stlačuje průměr. Nutná revize cenotvorby.</div>
+      </div>
+    </div>
+
+    <h3>Stakeholdeři a rozhodnutí</h3>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Stakeholder</th><th>Klíčové rozhodnutí</th></tr>
+      <tr><td>Operations Manager</td><td>Na základě mapy „hluchých míst" mění trasy servisních vozů</td></tr>
+      <tr><td>Marketingový specialista</td><td>CR u studentů → spustí cílenou retenční kampaň v aplikaci</td></tr>
+      <tr><td>Fleet Strategist</td><td>Nízké RPK + časté vybíjení → nákup strojů s větší baterií</td></tr>
+    </table>
+    </div>
+
+    <h3>Předpoklady a omezení</h3>
+    <ul>
+      <li>GPS pings: frekvence 1/30 s během jízdy; historická data v DuckDB</li>
+      <li>Batch zpracování: ELT jednou denně (D+1), nikoliv real-time</li>
+      <li>Sezónnost: dramatický propad v zimě (listopad–únor) a za deštivých dnů</li>
+      <li>Část dat je <strong>syntetická</strong> – výsledky jsou ilustrativní, nikoli produkční</li>
+    </ul>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- SEKCE 2 -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <section id="s2">
+    <h2>⚙️ 2. Technické řešení (architektura datové platformy)</h2>
+
+    <h3>Zdrojová data</h3>
+    <ul>
+      <li><strong>IoT Telemetrie (simulována):</strong> GPS pings → <code>trips_raw.csv</code></li>
+      <li><strong>Transakční systém (simulován):</strong> jízdy, platby, zákazníci → CSV</li>
+      <li><strong>Počasí (reálná metodika, syntetická data):</strong> hodinové záznamy → <code>weather_raw.csv</code></li>
+    </ul>
+
+    <h3>High-level architektura</h3>
+    <div class="arch-diagram">
+      <div class="arch-box"><span class="icon">📡</span>CSV / JSON<br>Raw sources</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box"><span class="icon">🐍</span>Python<br>generate_data.py</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box highlight"><span class="icon">🦆</span>DuckDB<br>Analytical Store</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box"><span class="icon">📓</span>Jupyter<br>EDA + KPI</div>
+    </div>
+
+    <h3>Datový tok (ELT pipeline)</h3>
+    <div class="arch-diagram">
+      <div class="arch-box"><span class="icon">📥</span>Ingesce<br>read_csv_auto</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box"><span class="icon">🧹</span>Staging<br>raw_* tabulky</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box"><span class="icon">✨</span>Transform<br>v_trips_clean</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box"><span class="icon">📊</span>KPI Views<br>v_kpi_*</div>
+    </div>
+
+    <h3>Uložení a škálování</h3>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Scénář</th><th>Řešení</th></tr>
+      <tr><td>Aktuální (≤ 1 GB)</td><td>DuckDB lokálně – jeden <code>.duckdb</code> soubor</td></tr>
+      <tr><td>×10 dat (~10 GB)</td><td>Partitioning podle roku/měsíce nebo migrace na <strong>MotherDuck</strong></td></tr>
+      <tr><td>Near-real-time</td><td>IoT → <strong>Apache Kafka</strong> → DuckDB append (micro-batch)</td></tr>
+    </table>
+    </div>
+
+    <h3>Zpracování – pipeline kroky</h3>
+    <ol>
+      <li><strong>Extrakce:</strong> Python načte CSV/JSON soubory</li>
+      <li><strong>Čištění:</strong> DuckDB WHERE filtry v <code>v_trips_clean</code></li>
+      <li><strong>Obohacení:</strong> LEFT JOIN s <code>raw_weather</code> na truncated timestamp</li>
+      <li><strong>Feature engineering:</strong> hour_of_day, is_weekend, speed_kmh, revenue_per_km</li>
+      <li><strong>Agregace:</strong> KPI views (denní UR, měsíční CR, týdenní RPK)</li>
+      <li><strong>Vizualizace:</strong> Jupyter notebook (matplotlib / seaborn)</li>
+    </ol>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- SEKCE 3 -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <section id="s3">
+    <h2>🛡️ 3. Strategie nakládání s daty (Data Governance)</h2>
+
+    <h3>Lifecycle a retence</h3>
+    <ul>
+      <li><strong>Fáze:</strong> Ingesce → Validace → Analýza → Archivace → Vymazání</li>
+      <li><strong>GPS pings (detail):</strong> retence 6 měsíců (optimalizace tras)</li>
+      <li><strong>Agregovaná data o jízdách:</strong> retence 5 let (meziroční srovnání)</li>
+    </ul>
+
+    <h3>RACI matice</h3>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Úkol</th><th>Data Engineer</th><th>Data Analyst</th><th>Product Owner</th></tr>
+      <tr><td>Sběr a čištění dat</td>
+        <td><span class="r">R</span></td><td><span class="i">I</span></td><td><span class="a">A</span></td></tr>
+      <tr><td>Tvorba dashboardů a KPI</td>
+        <td><span class="c">C</span></td><td><span class="r">R</span></td><td><span class="a">A</span></td></tr>
+      <tr><td>Definice business otázek</td>
+        <td><span class="i">I</span></td><td><span class="c">C</span></td><td><span class="r">R</span></td></tr>
+    </table>
+    </div>
+    <p style="font-size:.8rem;color:#7f8c8d">R = Responsible, A = Accountable, C = Consulted, I = Informed</p>
+
+    <h3>Kvalita dat – dimenze, metriky a prahové hodnoty</h3>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Dimenze</th><th>Metrika</th><th>Práh</th><th>Validace v DuckDB</th></tr>
+      <tr><td>Přesnost</td><td>GPS mimo ČR</td><td>0 %</td>
+        <td><code>start_lat BETWEEN 49.9 AND 50.3</code></td></tr>
+      <tr><td>Platnost</td><td>Záporná vzdálenost</td><td>0 %</td>
+        <td><code>distance_km &gt; 0</code></td></tr>
+      <tr><td>Platnost</td><td>Záporná cena</td><td>0 %</td>
+        <td><code>revenue_czk &gt; 0</code></td></tr>
+      <tr><td>Úplnost</td><td>Chybějící user_id</td><td>&lt; 0.1 %</td>
+        <td><code>user_id IS NOT NULL</code></td></tr>
+      <tr><td>Konzistence</td><td>Outlier: jízda &gt; 5 h</td><td>&lt; 0.5 %</td>
+        <td><code>duration_min &lt;= 300</code></td></tr>
+      <tr><td>Včasnost</td><td>Data za předchozí den</td><td>do 8:00</td>
+        <td>Monitorovaný ELT job (cron)</td></tr>
+    </table>
+    </div>
+
+    <div class="alert alert-warning">
+      <strong>⚠️ Etika a rizika:</strong> Syntetická data mohou postrádat nepředvídatelné anomálie reálného světa (pouliční uzavírky, výpadky aplikace). Model může být zkreslen ve prospěch centra Prahy, kde je hustota dat nejvyšší. Veškerá osobní data jsou anonymizována na úrovni <code>user_id</code>.
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- SEKCE 4 -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <section id="s4">
+    <h2>📊 4. Data a prezentace</h2>
+
+    <h3>Přehled datasetů</h3>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Dataset</th><th>Zdroj</th><th>Rozsah</th><th>Granularita</th><th>Klíče</th><th>Licence</th></tr>
+      <tr>
+        <td><code>trips_raw.csv</code></td>
+        <td><span class="badge badge-yellow">Syntetická</span></td>
+        <td>522 000 jízd (2023–2024)</td>
+        <td>Jednotlivá jízda</td>
+        <td>PK: trip_id<br>FK: user_id, vehicle_id</td>
+        <td>MIT/Synthetic</td>
+      </tr>
+      <tr>
+        <td><code>users_raw.csv</code></td>
+        <td><span class="badge badge-yellow">Syntetická</span></td>
+        <td>50 000 uživatelů</td>
+        <td>Jeden uživatel</td>
+        <td>PK: user_id</td>
+        <td>MIT/Synthetic</td>
+      </tr>
+      <tr>
+        <td><code>vehicles_raw.csv</code></td>
+        <td><span class="badge badge-yellow">Syntetická</span></td>
+        <td>2 000 vozidel</td>
+        <td>Jedno vozidlo</td>
+        <td>PK: vehicle_id</td>
+        <td>MIT/Synthetic</td>
+      </tr>
+      <tr>
+        <td><code>weather_raw.csv</code></td>
+        <td><span class="badge badge-blue">Reálná metodika</span></td>
+        <td>17 544 hodinových záznamů</td>
+        <td>1 hodina</td>
+        <td>PK: timestamp</td>
+        <td>CC BY 4.0</td>
+      </tr>
+    </table>
+    </div>
+
+    <h3>Schéma databáze (DuckDB)</h3>
+<pre><span class="cmt">-- Surové tabulky (raw layer)</span>
+<span class="kw">CREATE TABLE</span> <span class="col">raw_trips</span> (
+  trip_id <span class="typ">BIGINT</span>, user_id <span class="typ">BIGINT</span>, vehicle_id <span class="typ">INTEGER</span>,
+  start_time <span class="typ">TIMESTAMP</span>, duration_min <span class="typ">DOUBLE</span>, distance_km <span class="typ">DOUBLE</span>,
+  revenue_czk <span class="typ">DOUBLE</span>, start_lat <span class="typ">DOUBLE</span>, start_lon <span class="typ">DOUBLE</span>,
+  end_lat <span class="typ">DOUBLE</span>, end_lon <span class="typ">DOUBLE</span>,
+  battery_start_pct <span class="typ">DOUBLE</span>, battery_end_pct <span class="typ">DOUBLE</span>
+);
+
+<span class="cmt">-- Sémantická vrstva (feature engineering + čištění + join s počasím)</span>
+<span class="kw">CREATE VIEW</span> <span class="col">v_trips_clean</span> <span class="kw">AS</span>
+  <span class="kw">SELECT</span> *, hour(start_time) <span class="kw">AS</span> hour_of_day,
+         isodow(start_time) >= 6 <span class="kw">AS</span> is_weekend,
+         distance_km / (duration_min/60.0) <span class="kw">AS</span> speed_kmh,
+         w.temperature_c, w.precipitation_mm  <span class="cmt">-- JOIN s počasím</span>
+  <span class="kw">FROM</span> raw_trips t
+  <span class="kw">LEFT JOIN</span> raw_weather w <span class="kw">ON</span> date_trunc('hour', t.start_time) = w.timestamp
+  <span class="kw">WHERE</span> distance_km > 0 <span class="kw">AND</span> duration_min BETWEEN 1 AND 300
+    <span class="kw">AND</span> revenue_czk > 0 <span class="kw">AND</span> user_id IS NOT NULL
+    <span class="kw">AND</span> start_lat BETWEEN 49.9 AND 50.3;
+
+<span class="cmt">-- KPI views</span>
+<span class="kw">CREATE VIEW</span> <span class="col">v_kpi_utilization</span> <span class="kw">AS</span> ...  <span class="cmt">-- UR denně</span>
+<span class="kw">CREATE VIEW</span> <span class="col">v_kpi_churn</span>       <span class="kw">AS</span> ...  <span class="cmt">-- CR měsíčně</span>
+<span class="kw">CREATE VIEW</span> <span class="col">v_kpi_rpk</span>         <span class="kw">AS</span> ...  <span class="cmt">-- RPK týdně</span></pre>
+
+    <h3>Metodika syntetických dat – jak jsme zabránili „příliš hezkým" datům</h3>
+    <ul>
+      <li><strong>Sezónnost:</strong> Počet generovaných jízd závisí na měsíčním multiplikátoru (leden 0.33×, červenec 1.32×)</li>
+      <li><strong>Hodinové špičky:</strong> Váhy pro každou hodinu dne (ranní 7–9h a odpolední 16–18h jsou 3× vyšší)</li>
+      <li><strong>Korelace s počasím:</strong> Teplota a srážky ovlivňují počet generovaných jízd (negativní korelace při dešti)</li>
+      <li><strong>Záměrné chyby (2.6 %):</strong> GPS v Atlantiku, záporné vzdálenosti, outlieři (jízda 24h), chybějící user_id</li>
+      <li><strong>Gaussovský šum:</strong> Na výnosech, vzdálenostech i teplotách přidán normální šum σ=2–5</li>
+    </ul>
+
+    <h3>Předzpracování (Preprocessing)</h3>
+    <ul>
+      <li>Typové konverze: text → <code>TIMESTAMP</code> (DuckDB <code>timestampformat</code>)</li>
+      <li>Feature engineering: <code>hour_of_day</code>, <code>is_weekend</code>, <code>speed_kmh</code>, <code>revenue_per_km</code></li>
+      <li>Obohacení: LEFT JOIN <code>raw_trips</code> ← <code>raw_weather</code> na zkrácený timestamp (hodina)</li>
+      <li>Filtrace: 6 pravidel Data Quality (viz sekce 3) → odstraněno 2.6 % záznamů (13 449 řádků)</li>
+    </ul>
+
+    <h3>EDA – přehled klíčových vizualizací a Business Insights</h3>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>#</th><th>Sekce / Graf</th><th>Typ vizualizace</th><th>KPI / Business Question</th><th>Manažerský závěr (Insight)</th></tr>
+      <tr><td>1</td><td>Data Quality Report</td><td>Bar chart + Histogram</td><td>Integrita dat</td><td>Odstraněno 2,6 % dat (13 400 záz.). Dataset je kvalitní a vhodný pro spolehlivou analytiku.</td></tr>
+      <tr><td>2</td><td>Data Profiling</td><td>Tabulka statistik</td><td>Popis datasetu</td><td>Průměrná jízda: 11,4 min, 2,66 km, 51 Kč. Konzistentní last-mile profil.</td></tr>
+      <tr><td>3</td><td>KPI Dashboard</td><td>Plotly Gauge</td><td>UR / CR / RPK</td><td>UR ~9 %, CR ~66 %, RPK ~19 Kč – všechna KPI pod cílem. Nutná optimalizace.</td></tr>
+      <tr><td>4</td><td>Korelační matice</td><td>Heatmap + Scatter</td><td>Vztahy metrik</td><td>Silná korelace vzdálenost ↔ tržba potvrzuje vzdálenostní tarifikaci.</td></tr>
+      <tr><td>5</td><td>Trend jízd v čase + YoY</td><td>Line + Bar combo</td><td>UR – sezónnost</td><td>Extrémní propad v zimě (65–70 %). Návrh: stáhnout 30–40 % flotily v zimě.</td></tr>
+      <tr><td>6</td><td>Segmentace (Sub. vs. Ad-hoc)</td><td>Bar chart (3×)</td><td>RPK – segmenty</td><td>Subscribers: 40 % jízd, 28 % tržeb. Ad-hoc rentabilnější per jízdu.</td></tr>
+      <tr><td>7</td><td>Distribuce délek jízd</td><td>Histogram + KDE</td><td>RPK – charakter</td><td>45 % jízd do 2 km. Typický last-mile. Zvýšit nástupní sazbu.</td></tr>
+      <tr><td>8</td><td>Teplota / Srážky vs. Poptávka</td><td>Scatter + regrese</td><td>BQ2 – počasí</td><td>Pokles 35–40 % za deště. Silná korelace teplota ↔ poptávka.</td></tr>
+      <tr><td>9</td><td>Outlieři v bateriích</td><td>Boxplot (2×)</td><td>BQ4 – servis</td><td>Vozidla s baterií &lt;70 % spotřebovávají 2× více energie/km.</td></tr>
+      <tr><td>10</td><td>Finanční ROI Model</td><td>Kalkulace</td><td>Business Value</td><td><strong>Únik:</strong> Ztráta 50 400 Kč/týden. Repase 42 strojů = ROI za 1,7 týdne.</td></tr>
+      <tr><td>11</td><td>Heatmapa vytíženosti</td><td>2D Heatmap</td><td>BQ1 – špičky</td><td>Dvě špičky: 7–9h a 16–18h. Noční svoz klíčový pro UR.</td></tr>
+      <tr><td>12</td><td>Geografické hotspoty</td><td>Scatter (mapa)</td><td>BQ1 – lokalizace</td><td>80 % jízd v 5 zónách centra. Svoz soustředit sem.</td></tr>
+      <tr><td>13</td><td>Churn &amp; Kohortová retence</td><td>Line + Heatmap</td><td>CR – retence</td><td>1-měsíční retence ~30 %. Kritický onboarding moment.</td></tr>
+      <tr><td>14</td><td>MoM Growth</td><td>Line Chart</td><td>Tempo růstu</td><td>Mírný MoM růst, ale silná sezónní volatilita.</td></tr>
+      <tr><td>15</td><td>Customer Lifetime Value</td><td>Bar + Scatter</td><td>Segment value</td><td><strong>Zlatý důl:</strong> Subscribers mají násobně vyšší CLV. Věrnost &gt; cena.</td></tr>
+    </table>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- SEKCE 5 -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <section id="s5">
+    <h2>💡 5. Diskuze, závěry a doporučení</h2>
+
+    <h3>Klíčové poznatky a manažerská rozhodnutí</h3>
+    <ul>
+      <li>🌞 <strong>Sezónnost UR a vliv teploty:</strong> Vytíženost flotily v létě dosahuje pouze ~10 % (výrazně pod cílem 18 %). Zároveň z dat plyne (Graf 4), že jakmile teplota klesne pod 10 °C, klesá poptávka o 28 %. <strong>Doporučení na zimu:</strong> Stáhnout minimálně 30 % vozidel z ulic do depa. Ušetří se fixní náklady na dobíjení a svoz (tzv. juicery), přičemž vozidla nebudou na ulici zbytečně degradovat vlivem mrazu.</li>
+      <li>🌧️ <strong>Věstavěná poptávka při dešti:</strong> Při srážkách > 2 mm/h padá počet jízd o ~35–40 %. <strong>Doporučení:</strong> Prostor pro dynamickou cenotvorbu v aplikaci – v předpovědi pro déšť nabídnout registrovaným uživatelům plošnou slevu 20 % k udržení pohybu flotily.</li>
+      <li>🔋 <strong>Odlehlé spotřeby a vliv terénu (Boxplot):</strong> Vozidla se zdravím baterie < 70 % spotřebovávají násobně více energie. Zároveň stroje v silně zatěžovaných zónách (Praha 1 - centrum) vykazují masivní počet anomálií s velmi rychlým ubitím baterie zřejmě vlivem kostkové dlažby a častého zastavování. <strong>Doporučení:</strong> Servis a výměnu baterií alokovat přednostně do zóny Praha 1.</li>
+      <li>👥 <strong>Segmenty a Byznysový paradox (CLV):</strong> Analýza odhalila fascinující fakt – ačkoliv předplatitelé (subscribers) platí za jízdu o 40 % méně, jejich dlouhodobá hodnota (CLV) je 4× vyšší než u ad-hoc turistů. <strong>Závěr:</strong> Cesta k zisku nevede přes drahé ad-hoc jízdy, ale přes budování věrné komunity. <strong>Doporučení:</strong> Brutální zaměření na konverzi ad-hoc uživatelů na balíčky předplatného po 1. jízdě.</li>
+      <li>📍 <strong>Strategická reorganizace flotily:</strong> Heatmapy ukazují „úmrtnost“ na okrajích Prahy. Flotila tam leží mrtvá, zatímco v centru lidé marně hledají stroje pro ranní commute (7–9h). <strong>Doporučení:</strong> Noční logistika musí být agresivnější v přesunu strojů z uzlů MHD zpět do rezidenčních čtvrtí každou noc.</li>
+      <li>💰 <strong>Kritický ROI Model a Únik peněz:</strong> Identifikovali jsme <strong>42 vozidel</strong> (tzv. zombií), která jen zabírají místo v terénu s vadnou baterií. Tyto stroje pálí <strong>50 400 Kč týdně</strong> čistého zisku. Celá oprava stojí 84 000 Kč – investice, která se vrátí za šokujících <strong>1.7 týdne</strong>. Tohle není údržba, to je přímé čištění peněžních toků.</li>
+    </ul>
+
+    <h3>Limity řešení</h3>
+    <ul>
+      <li><strong>Syntetická data:</strong> Chybí nepředvídatelné anomálie reálného světa (výpadky, pouliční uzavírky, speciální akce)</li>
+      <li><strong>Bias:</strong> Centrum Prahy je nadreprezentováno; hustota pingu je nižší na periferii</li>
+      <li><strong>Latence D+1:</strong> Batch zpracování neumožňuje okamžitou reakci na výpadek strojů v terénu</li>
+      <li><strong>Absence real-time:</strong> UR se počítá retrospektivně – nelze reagovat intra-day</li>
+    </ul>
+
+    <h3>Budoucnost a AI</h3>
+    <ul>
+      <li><strong>Prediktivní údržba:</strong> ML modely (Random Forest / XGBoost) pro predikci selhání baterie</li>
+      <li><strong>Dynamická cenotvorba:</strong> Cena jízdy automaticky klesá při dešti nebo volné kapacitě</li>
+      <li><strong>Optimalizace svozu:</strong> AI agenti pro real-time routování servisních vozů (TSP / VRP)</li>
+    </ul>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- SEKCE 6 -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <section id="s6">
+    <h2>🔬 6. Metodika a postup</h2>
+
+    <h3>Workflow</h3>
+    <ol>
+      <li><strong>Sourcing:</strong> <code>generate_data.py</code> – generování 522 000+ řádků dat (záměrné chyby, sezónnost)</li>
+      <li><strong>Storage:</strong> <code>init_db.py</code> – ELT do DuckDB: 4 raw tabulky + 7 views (KPI + analytické)</li>
+      <li><strong>Helpers:</strong> <code>helpers.py</code> – modulární vizualizační a analytické funkce (16 funkcí)</li>
+      <li><strong>Analytics:</strong> <code>analyza_final.ipynb</code> – EDA, 15 vizualizací, Storytelling, kohortová analýza, CLV</li>
+    </ol>
+
+    <h3>Replikace projektu</h3>
+<pre>git clone &lt;repo&gt; &amp;&amp; cd big_data
+python -m venv venv &amp;&amp; source venv/bin/activate
+pip install duckdb pandas numpy matplotlib seaborn plotly folium
+
+python generate_data.py   <span class="cmt"># ~30 s – generuje 4 CSV soubory</span>
+python init_db.py         <span class="cmt"># ~10 s – inicializuje VoltCity.duckdb</span>
+jupyter lab analyza_final.ipynb <span class="cmt"># spustí finální notebook s kompletní EDA</span>
+<span class="cmt"># Notebook importuje helpers.py – modul s vizualizačními funkcemi</span></pre>
+
+    <h3>Rozdělení rolí</h3>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Člen</th><th>Role</th><th>Odpovědnosti</th></tr>
+      <tr><td>Jakub Ráž</td><td>Data Engineer &amp; Analyst</td><td><code>generate_data.py</code>, <code>init_db.py</code>, DuckDB schéma, KPI views, <code>helpers.py</code>, <code>analyza_final.ipynb</code> – EDA, vizualizace</td></tr>
+      <tr><td>Matyáš Vesecký</td><td>Data Strategist &amp; Analyst</td><td>Governance, HTML dokumentace (<code>index.html</code>), business interpretace, etika, prezentace</td></tr>
+    </table>
+    </div>
+
+    <h3>Analytický Stack & Performance</h3>
+    <ul>
+      <li><strong>Python 3.11:</strong> Srdce logiky, orchestrace generování a čištění dat.</li>
+      <li><strong>DuckDB 1.1:</strong> <span class="badge badge-green">MVP Projektu</span> – High-performance analytical engine schopný zpracovat 500k+ jízd v řádu milisekund. SQL na steroidech bez nutnosti serveru.</li>
+      <li><strong>Pandas & Seaborn:</strong> Statistická preciznost a profesionální vizualizace pro business storytelling.</li>
+      <li><strong>Vault:</strong> Lokální OLAP soubor <code>VoltCity.duckdb</code> – maximální přenositelnost a 0ms síťová latence.</li>
+    </ul>
+
+    <h3>Použití Generativní AI (Gemini)</h3>
+    <ul>
+      <li><strong>Klíčové prompty:</strong>
+        <ul>
+          <li><em>„Navrhni architekturu datové platformy pro sdílenou mikromobilitu v DuckDB"</em></li>
+          <li><em>„Vytvoř Python generátor syntetických dat s realistickou sezónností pro Praha"</em></li>
+          <li><em>„Navrhni KPI views v DuckDB SQL pro Utilization Rate, Churn Rate a Revenue per KM"</em></li>
+        </ul>
+      </li>
+      <li><strong>Ověření:</strong> Všechny AI výstupy byly ručně zkorigovány – ověřeny SQL dotazy v DuckDB CLI, otestovány hodnoty KPI s reálnými daty mikromobility (Lime, Bolt).</li>
+      <li><strong>Co bylo převzato:</strong> Struktura KPI views, schéma DuckDB tabulek. Vše upraveno tak, aby odpovídalo reálné byznys logice.</li>
+    </ul>
+
+    <h3>Zdroje</h3>
+    <ul>
+      <li>DuckDB dokumentace: <a href="https://duckdb.org/docs" target="_blank">duckdb.org/docs</a></li>
+      <li>McKinsey & Company: <em>Urban micromobility: How cities and operators can navigate disruption</em> (2021)</li>
+      <li>European Cyclists' Federation: Micromobility usage statistics (2023)</li>
+      <li>OpenWeatherMap API – metodika hodinových průměrů pro ČR</li>
+    </ul>
+
+    <div class="alert alert-success">
+      <strong>✅ Projekt je plně reprodukovatelný.</strong> Stačí spustit tři příkazy (<code>generate_data.py</code> → <code>init_db.py</code> → <code>jupyter lab</code>) a celý datový produkt se sestaví od nuly.
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // Aktivní link v navigaci dle scrollu
+  const sections = document.querySelectorAll('section');
+  const links    = document.querySelectorAll('nav a[href^="#"]');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`nav a[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.35 });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
